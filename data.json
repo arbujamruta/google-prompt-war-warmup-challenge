@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "title": "Budgeting",
+    "description": "A budget is a plan for your money. It tracks what you earn and what you spend.",
+    "example": "Following the 50/30/20 rule: 50% for needs, 30% for wants, and 20% for savings.",
+    "question": "Have you tracked your spending over the last 30 days?"
+  },
+  {
+    "id": 2,
+    "title": "Saving vs. Investing",
+    "description": "Saving is parking money for short-term goals. Investing is making your money grow over the long term.",
+    "example": "Saving for a vacation next year vs. investing for retirement in 30 years.",
+    "question": "Are you saving cash right now when you should be investing it?"
+  },
+  {
+    "id": 3,
+    "title": "Compound Interest",
+    "description": "Money grows faster when interest is earned on both the principal and the past interest.",
+    "example": "₹1000 at 10% grows to ₹1100, then ₹1210 next year. It's interest on your interest!",
+    "question": "Do you invest regularly to benefit from compounding?"
+  },
+  {
+    "id": 4,
+    "title": "Emergency Fund",
+    "description": "A safety net of cash for unexpected expenses like medical bills or job loss.",
+    "example": "Having 3 to 6 months' worth of living expenses in a highly liquid savings account.",
+    "question": "If your car broke down today, could you pay for it without debt?"
+  },
+  {
+    "id": 5,
+    "title": "Inflation",
+    "description": "The rate at which the general level of prices for goods and services rises, eroding purchasing power.",
+    "example": "A cup of coffee that cost ₹50 ten years ago might cost ₹150 today.",
+    "question": "Is the interest on your savings account beating inflation?"
+  },
+  {
+    "id": 6,
+    "title": "Credit Score Basics",
+    "description": "A number representing your creditworthiness, based on your borrowing and repayment history.",
+    "example": "Paying your credit card in full and on time every month boosts your score.",
+    "question": "Do you know your current credit score?"
+  },
+  {
+    "id": 7,
+    "title": "Diversification",
+    "description": "Spreading your investments around to reduce risk. 'Don't put all your eggs in one basket.'",
+    "example": "Investing in stocks, bonds, and real estate instead of just one company's stock.",
+    "question": "Is your current portfolio relying too heavily on one asset?"
+  },
+  {
+    "id": 8,
+    "title": "Assets vs. Liabilities",
+    "description": "An asset puts money in your pocket. A liability takes money out of your pocket.",
+    "example": "A rental property generating income is an asset. A personal car loan is a liability.",
+    "question": "Are you buying assets or just collecting liabilities?"
+  }
+]
