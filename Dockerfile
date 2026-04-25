@@ -1,18 +1,22 @@
-# Use a lightweight Nginx image
-FROM nginx:alpine
+# Use lightweight Node image
+FROM node:18-alpine
 
-# Copy the static files to Nginx's default public directory
-COPY index.html /usr/share/nginx/html/
-COPY styles.css /usr/share/nginx/html/
-COPY app.js /usr/share/nginx/html/
-COPY data.json /usr/share/nginx/html/
+# Set working directory
+WORKDIR /app
 
-# Expose port 8080 (Cloud Run default requirement for custom containers if configured, but default Nginx uses 80. Let's configure it for 8080)
-# We override the default nginx config to listen on port 8080 instead of 80 to easily support Cloud Run's default expectations
-RUN sed -i 's/listen  *80;/listen 8080;/g' /etc/nginx/conf.d/default.conf
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install --production
 
-# Expose the port
+# Copy application files
+COPY src/ ./src/
+COPY public/ ./public/
+
+# Cloud Run sets the PORT environment variable to 8080 by default.
+ENV PORT=8080
+
+# Expose port
 EXPOSE 8080
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start server
+CMD ["node", "src/server.js"]

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinBuddy - Your Tiny Finance Learning Companion</title>
+    <meta name="description" content="Learn bite-sized finance concepts daily with FinBuddy.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header>
+            <div class="header-top">
+                <h1>Hi, I'm FinBuddy <span role="img" aria-label="wave">👋</span></h1>
+                <div class="streak-badge" id="streakBadge" aria-live="polite"><span role="img" aria-label="fire">🔥</span> 0-day streak!</div>
+            </div>
+            <p class="subtitle">Let's grow your money mindset, one concept at a time.</p>
+        </header>
+
+        <!-- Progress Section -->
+        <section class="progress-section" aria-label="Learning Progress">
+            <div class="progress-text">
+                <span id="progressText" aria-live="polite">You've learned 0/0 topics</span>
+            </div>
+            <div class="progress-bar-container" aria-hidden="true">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </section>
+
+        <!-- Main Card Section -->
+        <main>
+            <div class="card-wrapper">
+                <div class="learning-card" id="learningCard" aria-live="polite">
+                    <div class="card-content">
+                        <span class="topic-tag">Topic of the Day</span>
+                        <h2 id="cardTitle">Loading...</h2>
+                        <p id="cardDescription" class="description"></p>
+                        <div class="example-box">
+                            <strong><span role="img" aria-label="idea">💡</span> Example:</strong>
+                            <p id="cardExample"></p>
+                        </div>
+                        <div class="reflection-box">
+                            <strong><span role="img" aria-label="thinking">🤔</span> Reflection:</strong>
+                            <p id="cardQuestion"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="prevBtn" class="nav-btn" aria-label="Previous Topic" disabled>← Prev</button>
+                <button id="markLearnedBtn" class="primary-btn" aria-label="Mark Topic as Learned">Mark as Learned ✅</button>
+                <button id="nextBtn" class="nav-btn" aria-label="Next Topic">Next →</button>
+            </div>
+            
+            <!-- Gemini AI Smart Tip Section -->
+            <div class="ai-section" style="margin-top: 16px; text-align: center;">
+                <button id="aiTipBtn" class="secondary-btn" aria-label="Get a smart finance tip">
+                    <span role="img" aria-label="bulb">💡</span> Get Smart Finance Tip
+                </button>
+                <div id="aiTipContainer" class="ai-tip-container" style="display: none; background: #e2f0fb; padding: 12px; border-radius: 8px; margin-top: 10px; font-style: italic; color: #2d3748;" aria-live="polite">
+                    Loading tip...
+                </div>
+            </div>
+        </main>
+
+        <!-- Tiny Interactive Element -->
+        <section class="interactive-section" aria-label="Compound Interest Calculator">
+            <div class="interactive-card">
+                <h3><span role="img" aria-label="sparkles">✨</span> Quick Compound Interest Calculator</h3>
+                <p class="small-text">See the magic of compounding over 10 years!</p>
+                <div class="calc-inputs">
+                    <div class="input-group">
+                        <label for="principalInput">Initial Amount (₹)</label>
+                        <input type="number" id="principalInput" value="1000" min="0" aria-label="Initial Amount">
+                    </div>
+                    <div class="input-group">
+                        <label for="rateInput">Annual Rate (%)</label>
+                        <input type="number" id="rateInput" value="10" min="0" max="100" aria-label="Annual Rate">
+                    </div>
+                </div>
+                <button id="calcBtn" class="secondary-btn" aria-label="Calculate Interest">Calculate</button>
+                <div class="calc-result" id="calcResult" aria-live="polite">
+                    After 10 years, you'll have: <strong>₹2593.74</strong>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Made with <span role="img" aria-label="heart">❤️</span> for better personal finance.</p>
+        </footer>
+    </div>
+
+    <!-- Celebration Overlay -->
+    <div class="confetti-container" id="confettiContainer" aria-hidden="true"></div>
+
+    <script src="utils.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
