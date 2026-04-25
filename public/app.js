@@ -2,7 +2,7 @@
 
 /**
  * FinBuddy Application Logic
- * Integrates UI interaction, local storage state, and backend APIs.
+ * Integrates UI interaction, local storage state, Gemini AI, and Google Cloud Translation.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,17 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
         rateInput: document.getElementById('rateInput'),
         calcBtn: document.getElementById('calcBtn'),
         calcResult: document.getElementById('calcResult'),
-        // Gemini Elements
         aiTipBtn: document.getElementById('aiTipBtn'),
-        aiTipContainer: document.getElementById('aiTipContainer')
+        aiTipContainer: document.getElementById('aiTipContainer'),
+        languageSelector: document.getElementById('languageSelector')
     };
 
     // Application State
     let concepts = [];
+    let originalConcepts = []; // always keeps English originals
     let currentIndex = 0;
     let learnedTopics = JSON.parse(localStorage.getItem('finBuddy_learned')) || [];
     let streak = parseInt(localStorage.getItem('finBuddy_streak')) || 0;
     let lastLogin = localStorage.getItem('finBuddy_lastLogin');
+    let currentLanguage = 'en';
+
+    // Translation cache: { 'hi': [{title, description, example, question}, ...] }
+    const translationCache = {};
 
     /**
      * Initializes the application by fetching data and setting up UI.
@@ -43,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await fetchConcepts();
         updateUI();
         attachEventListeners();
-        handleCalculate(); // initial calc
+        handleCalculate();
     }
 
     /**
@@ -52,9 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchConcepts() {
         try {
             const response = await fetch('data.json');
-            concepts = await response.json();
-            
-            // Default to first unlearned topic, or 0 if all learned
+            originalConcepts = await response.json();
+            concepts = originalConcepts;
+
             const firstUnlearned = concepts.findIndex(c => !learnedTopics.includes(c.id));
             currentIndex = firstUnlearned !== -1 ? firstUnlearned : 0;
         } catch (error) {
@@ -73,14 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (lastLogin) {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
-                
                 if (lastLogin === yesterday.toDateString()) {
                     streak++;
                 } else {
-                    streak = 1; // Streak broken
+                    streak = 1;
                 }
             } else {
-                streak = 1; // First login
+                streak = 1;
             }
             localStorage.setItem('finBuddy_streak', streak);
             localStorage.setItem('finBuddy_lastLogin', today);
@@ -97,13 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const isLearned = learnedTopics.includes(concept.id);
 
         elements.learningCard.style.opacity = '0';
-        
+
         setTimeout(() => {
             elements.cardTitle.textContent = concept.title;
             elements.cardDescription.textContent = concept.description;
             elements.cardExample.textContent = concept.example;
             elements.cardQuestion.textContent = concept.question;
-            
+
             if (isLearned) {
                 elements.markLearnedBtn.innerHTML = 'Learned <span aria-hidden="true">✅</span>';
                 elements.markLearnedBtn.classList.add('learned');
@@ -115,20 +119,84 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.learningCard.style.opacity = '1';
         }, 300);
 
-        // Uses global calculateProgress from utils.js
         const progressPercentage = window.calculateProgress(learnedTopics.length, concepts.length);
-        
         elements.progressText.textContent = `You've learned ${learnedTopics.length}/${concepts.length} topics`;
         elements.progressBar.style.width = `${progressPercentage}%`;
-
         elements.streakBadge.innerHTML = `<span aria-hidden="true">🔥</span> ${streak}-day streak!`;
-
         elements.prevBtn.disabled = currentIndex === 0;
         elements.nextBtn.disabled = currentIndex === concepts.length - 1;
-        
-        // Hide AI tip when changing cards
         elements.aiTipContainer.style.display = 'none';
         elements.aiTipContainer.textContent = '';
+    }
+
+    /**
+     * Handles language selection change.
+     * Uses a local cache to avoid redundant API calls.
+     * @param {string} lang - Target language code (e.g., 'hi', 'es')
+     */
+    async function handleLanguageChange(lang) {
+        currentLanguage = lang;
+
+        if (lang === 'en') {
+            // Restore English originals instantly - no API needed
+            concepts = originalConcepts;
+            updateUI();
+            return;
+        }
+
+        // Serve from cache if available
+        if (translationCache[lang]) {
+            concepts = translationCache[lang];
+            updateUI();
+            return;
+        }
+
+        // Show loading state on the card
+        elements.cardTitle.textContent = '🌐 Translating...';
+        elements.cardDescription.textContent = '';
+        elements.cardExample.textContent = '';
+        elements.cardQuestion.textContent = '';
+
+        try {
+            // Flatten all texts to translate in one batched request
+            const textsToTranslate = originalConcepts.flatMap(c => [
+                c.title, c.description, c.example, c.question
+            ]);
+
+            const response = await fetch('/api/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texts: textsToTranslate, targetLanguage: lang })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Reconstruct the concepts array from the flat translations array
+                const translated = [];
+                for (let i = 0; i < originalConcepts.length; i++) {
+                    translated.push({
+                        id: originalConcepts[i].id,
+                        title: data.translations[i * 4],
+                        description: data.translations[i * 4 + 1],
+                        example: data.translations[i * 4 + 2],
+                        question: data.translations[i * 4 + 3]
+                    });
+                }
+
+                // Store in cache for future use
+                translationCache[lang] = translated;
+                concepts = translated;
+            } else {
+                console.error('Translation error:', data.error);
+                concepts = originalConcepts; // Fallback to English
+            }
+        } catch (error) {
+            console.error('Translation request failed:', error);
+            concepts = originalConcepts;
+        }
+
+        updateUI();
     }
 
     /**
@@ -136,20 +204,20 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function getSmartTip() {
         if (!concepts.length) return;
-        const currentTopic = concepts[currentIndex].title;
-        
+        const currentTopic = originalConcepts[currentIndex].title; // Always use English topic for Gemini
+
         elements.aiTipContainer.style.display = 'block';
         elements.aiTipContainer.textContent = '🧠 Analyzing with AI...';
-        
+
         try {
             const response = await fetch('/api/gemini', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ topic: currentTopic })
             });
-            
+
             const data = await response.json();
-            
+
             if (response.ok) {
                 elements.aiTipContainer.innerHTML = `<strong>💡 AI Tip:</strong> ${data.tip}`;
             } else {
@@ -166,12 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleCalculate() {
         const p = parseFloat(elements.principalInput.value) || 0;
         const r = parseFloat(elements.rateInput.value) || 0;
-        
-        // Uses global calculateCompoundInterestAmount from utils.js
+
         const amount = window.calculateCompoundInterestAmount(p, r, 10);
-        
         elements.calcResult.innerHTML = `After 10 years, you'll have: <strong>₹${amount.toFixed(2)}</strong>`;
-        
+
         elements.calcResult.style.transform = 'scale(1.05)';
         setTimeout(() => {
             elements.calcResult.style.transform = 'scale(1)';
@@ -195,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!learnedTopics.includes(concept.id)) {
                 learnedTopics.push(concept.id);
                 localStorage.setItem('finBuddy_learned', JSON.stringify(learnedTopics));
-                
+
                 elements.markLearnedBtn.style.transform = 'scale(0.9)';
                 setTimeout(() => {
                     elements.markLearnedBtn.style.transform = 'scale(1)';
@@ -207,8 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.calcBtn.addEventListener('click', handleCalculate);
         elements.principalInput.addEventListener('input', handleCalculate);
         elements.rateInput.addEventListener('input', handleCalculate);
-        
         elements.aiTipBtn.addEventListener('click', getSmartTip);
+
+        // Language selector change event
+        elements.languageSelector.addEventListener('change', (e) => {
+            handleLanguageChange(e.target.value);
+        });
     }
 
     // Start App

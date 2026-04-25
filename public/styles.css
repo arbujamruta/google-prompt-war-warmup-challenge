@@ -49,6 +49,42 @@ header {
     margin-bottom: 8px;
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Language Selector */
+.lang-selector {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border: 2px solid var(--secondary-color);
+    border-radius: 20px;
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition);
+}
+
+.lang-selector:hover {
+    border-color: var(--primary-color);
+}
+
+.lang-selector:focus-visible {
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.4);
+    border-color: var(--primary-color);
+}
+
+/* Focus styles for keyboard navigation */
+button:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
 h1 {
     font-size: 1.8rem;
     font-weight: 600;
@@ -310,6 +346,11 @@ footer {
     .header-top {
         flex-direction: column;
         gap: 10px;
+    }
+
+    .header-controls {
+        flex-wrap: wrap;
+        justify-content: center;
     }
     
     .action-buttons {
