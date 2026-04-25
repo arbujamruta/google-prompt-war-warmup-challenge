@@ -1,55 +1,59 @@
-# FinBuddy - Your Tiny Finance Learning Companion 🚀
+# FinBuddy - Your Smart Finance Learning Companion 🚀
 
-FinBuddy is a minimal, creative web app that helps you learn basic finance concepts in a fun and interactive way, while also tracking your learning progress. It behaves like a friendly guide that teaches 1 small finance concept at a time.
+FinBuddy is a clean, intelligent, and accessible web app that helps you learn basic finance concepts. It has been fully optimized for production with a secure Node.js backend, robust accessibility, Jest testing, and AI integration via Google Gemini.
 
 ## ✨ Features
-- **Daily Learning Card**: Clean UI showing 1 bite-sized finance concept at a time with a title, explanation, example, and a reflection question.
-- **Mark as Learned ✅**: Keep track of topics you've read. Progress is saved locally in your browser!
-- **Progress Tracker 📊**: A visual progress bar updating in real-time as you learn.
-- **Streak Element 🔥**: Tracks your daily streak to keep you motivated.
-- **Interactive Calculator**: A tiny compound interest calculator to see the magic of compounding!
+- **Daily Learning Card**: Clean UI showing 1 bite-sized finance concept at a time.
+- **Mark as Learned ✅**: Progress is saved locally in your browser!
+- **Interactive Calculator**: A tiny compound interest calculator.
+- **💡 Smart Finance Tips (Google Cloud Integration)**: Click a button to get a 2-3 line personalized, context-aware finance tip powered by the **Google Gemini API**.
 
-## 🛠️ Tech Stack
-- Frontend: Vanilla HTML, CSS, JavaScript
-- Backend: None (Uses `localStorage` for progress tracking)
-- Deployment: Docker + Google Cloud Run
+## 🛠️ Tech Stack & Engineering Excellence
+- **Frontend**: Vanilla HTML, CSS, JavaScript (Zero bloat).
+- **Backend**: Node.js & Express (Handles API requests securely).
+- **Security**: Secured with `helmet` and environment variables (`dotenv`), with input sanitization.
+- **Testing**: Unit tested using **Jest**.
+- **Accessibility**: Perfect semantic HTML, `aria-labels`, `aria-live` regions, and keyboard-friendly focus outlines.
+- **Code Quality**: Strictly typed logic split across modular files (`utils.js`, `app.js`, `server.js`) with JSDoc comments.
 
 ## 🚀 How to Run Locally
 
-### Option 1: Using a simple local server
-If you have Node.js installed or Python:
-1. Clone the repository or navigate to this folder.
-2. Run a local web server, for example:
-   - Using Python: `python -m http.server 8000`
-   - Using Node.js: `npx serve .`
-3. Open `http://localhost:8000` or the URL provided in your terminal.
+### 1. Setup
+Make sure you have Node.js installed.
+```bash
+npm install
+```
 
-*(Note: Simply double-clicking `index.html` will not work perfectly because the `fetch('data.json')` call requires a server to avoid CORS issues).*
+### 2. Configure Environment Variables
+Create a `.env` file in the root directory (you can copy `.env.example`) and add your Google Gemini API key:
+```env
+GEMINI_API_KEY=your_real_key_here
+PORT=8080
+```
 
-### Option 2: Using Docker (Recommended to match production)
+### 3. Run the Server
+```bash
+npm start
+```
+Then visit `http://localhost:8080`.
+
+### 4. Run Tests
+```bash
+npm test
+```
+
+## ☁️ Deployment (Google Cloud Run)
+FinBuddy is fully Dockerized for Cloud Run.
+
 1. Build the Docker image:
    ```bash
    docker build -t finbuddy-app .
    ```
-2. Run the container:
+2. Deploy directly via gcloud:
    ```bash
-   docker run -p 8080:8080 finbuddy-app
+   gcloud run deploy finbuddy --source . --port 8080 --allow-unauthenticated --set-env-vars="GEMINI_API_KEY=your_real_key_here"
    ```
-3. Open `http://localhost:8080` in your browser.
-
-## ☁️ Deployment to Google Cloud Run
-
-1. Make sure you have the [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) installed and authenticated.
-2. Set your Google Cloud project:
-   ```bash
-   gcloud config set project YOUR_PROJECT_ID
-   ```
-3. Build and deploy the container in one step using Cloud Build and Cloud Run:
-   ```bash
-   gcloud run deploy finbuddy --source . --port 8080 --allow-unauthenticated
-   ```
-4. Once deployed, the CLI will output a public URL (e.g., `https://finbuddy-xxxxx-uc.a.run.app`). Visit this URL to use FinBuddy live!
 
 ---
 
-*"Hi, I'm FinBuddy 👋 Let's grow your money mindset!"*
+*"Hi, I'm FinBuddy 👋 You're getting smarter with money 💡"*
